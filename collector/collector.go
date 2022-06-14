@@ -2,6 +2,7 @@ package collector
 
 import (
 	"encoding/json"
+	"strconv"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/skillz-blockchain/near-exporter/api"
@@ -88,55 +89,55 @@ func NewCollector(client *api.Client) *Collector {
 		validatorStakeDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_stake",
 			"Current amount of validator stake",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		validatorSlashedDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_slashed",
 			"Validators slashed",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		validatorExpectedBlocksDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_blocks_expected",
 			"Current amount of validator expected blocks",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		validatorProducedBlocksDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_blocks_produced",
 			"Current amount of validator produced blocks",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		validatorExpectedChunksDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_chunks_expected",
 			"Current amount of validator expected chunks",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		validatorProducedChunksDesc: prometheus.NewDesc(
 			MetricPrefix+"validator_chunks_produced",
 			"Current amount of validator produced chunks",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		nextValidatorStakeDesc: prometheus.NewDesc(
 			MetricPrefix+"next_validator_stake",
 			"The next validators",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		currentProposalsDesc: prometheus.NewDesc(
 			MetricPrefix+"current_proposals_stake",
 			"Current proposals",
-			[]string{"account_id", "public_key", "tracked"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 			nil,
 		),
 		prevEpochKickoutDesc: prometheus.NewDesc(
 			MetricPrefix+"prev_epoch_kickout",
 			"Near previous epoch kicked out validators",
-			[]string{"account_id", "reason", "tracked"},
+			[]string{"account_id", "reason", "epoch_start_height", "tracked"},
 			nil,
 		),
 		epochLength: prometheus.NewDesc(
@@ -248,17 +249,17 @@ func (c *Collector) collectValidators(ch chan<- prometheus.Metric) {
 	for _, v := range validators.CurrentValidators {
 		isTracked := c.isTracked(v.AccountId)
 
-		ch <- prometheus.MustNewConstMetric(c.validatorExpectedChunksDesc, prometheus.GaugeValue, float64(v.NumExpectedChunks), v.AccountId, v.PublicKey, isTracked)
-		ch <- prometheus.MustNewConstMetric(c.validatorProducedChunksDesc, prometheus.GaugeValue, float64(v.NumProducedChunks), v.AccountId, v.PublicKey, isTracked)
-		ch <- prometheus.MustNewConstMetric(c.validatorExpectedBlocksDesc, prometheus.GaugeValue, float64(v.NumExpectedBlocks), v.AccountId, v.PublicKey, isTracked)
-		ch <- prometheus.MustNewConstMetric(c.validatorProducedBlocksDesc, prometheus.GaugeValue, float64(v.NumProducedBlocks), v.AccountId, v.PublicKey, isTracked)
-		ch <- prometheus.MustNewConstMetric(c.validatorStakeDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorExpectedChunksDesc, prometheus.GaugeValue, float64(v.NumExpectedChunks), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorProducedChunksDesc, prometheus.GaugeValue, float64(v.NumProducedChunks), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorExpectedBlocksDesc, prometheus.GaugeValue, float64(v.NumExpectedBlocks), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorProducedBlocksDesc, prometheus.GaugeValue, float64(v.NumProducedBlocks), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorStakeDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
 
 		isSlashed := 0
 		if v.IsSlashed {
 			isSlashed = 1
 		}
-		ch <- prometheus.MustNewConstMetric(c.validatorSlashedDesc, prometheus.GaugeValue, float64(isSlashed), v.AccountId, v.PublicKey, isTracked)
+		ch <- prometheus.MustNewConstMetric(c.validatorSlashedDesc, prometheus.GaugeValue, float64(isSlashed), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), isTracked)
 
 		t := GetStakeFromString(v.Stake)
 		if seatPrice == 0 {
@@ -272,16 +273,16 @@ func (c *Collector) collectValidators(ch chan<- prometheus.Metric) {
 	ch <- prometheus.MustNewConstMetric(c.seatPriceDesc, prometheus.GaugeValue, seatPrice)
 
 	for _, v := range validators.NextValidators {
-		ch <- prometheus.MustNewConstMetric(c.nextValidatorStakeDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, c.isTracked(v.AccountId))
+		ch <- prometheus.MustNewConstMetric(c.nextValidatorStakeDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), c.isTracked(v.AccountId))
 	}
 
 	for _, v := range validators.CurrentProposals {
-		ch <- prometheus.MustNewConstMetric(c.currentProposalsDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, c.isTracked(v.AccountId))
+		ch <- prometheus.MustNewConstMetric(c.currentProposalsDesc, prometheus.GaugeValue, float64(GetStakeFromString(v.Stake)), v.AccountId, v.PublicKey, strconv.FormatInt(validators.EpochStartHeight, 10), c.isTracked(v.AccountId))
 	}
 
 	for _, v := range validators.PrevEpochKickOut {
 		reason, _ := json.Marshal(v.Reason)
-		ch <- prometheus.MustNewConstMetric(c.prevEpochKickoutDesc, prometheus.GaugeValue, 0, v.AccountId, string(reason), c.isTracked(v.AccountId))
+		ch <- prometheus.MustNewConstMetric(c.prevEpochKickoutDesc, prometheus.GaugeValue, 0, v.AccountId, string(reason), strconv.FormatInt(validators.EpochStartHeight, 10), c.isTracked(v.AccountId))
 	}
 }
 
