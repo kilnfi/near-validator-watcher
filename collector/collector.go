@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"strconv"
 
+	"github.com/kilnfi/near-exporter/api"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/skillz-blockchain/near-exporter/api"
 )
 
 const MetricPrefix = "near_exporter_"

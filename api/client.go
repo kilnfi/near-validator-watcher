@@ -3,7 +3,6 @@ package api
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"log"
@@ -52,6 +51,9 @@ func (c *Client) Request(method string, params interface{}) (*Response, error) {
 	payload, err := json.Marshal(map[string]string{
 		"query": method,
 	})
+	if err != nil {
+		log.Println(err)
+	}
 
 	if params != "" {
 		p := Payload{
@@ -62,7 +64,6 @@ func (c *Client) Request(method string, params interface{}) (*Response, error) {
 		}
 
 		payload, err = json.Marshal(p)
-
 		if err != nil {
 			log.Println(err)
 		}
@@ -84,7 +85,6 @@ func (c *Client) Request(method string, params interface{}) (*Response, error) {
 	if err != nil {
 		return nil, err
 	}
-	// fmt.Println(string(body))
 
 	var resp *Response
 	err = json.Unmarshal(body, &resp)
@@ -103,12 +103,12 @@ func (c *Client) do(method string, params interface{}, result interface{}) error
 	}
 
 	if resp.Error.Name != "" {
-		return errors.New(fmt.Sprintf(
+		return fmt.Errorf(
 			"jsonrpc error(%d): %s %s",
 			resp.Error.Code,
 			resp.Error.Name,
 			resp.Error.Message,
-		))
+		)
 	}
 
 	err = json.Unmarshal(resp.Result, &result)

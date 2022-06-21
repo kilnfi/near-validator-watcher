@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
+	"github.com/kilnfi/near-exporter/api"
+	"github.com/kilnfi/near-exporter/collector"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/skillz-blockchain/near-exporter/api"
-	"github.com/skillz-blockchain/near-exporter/collector"
 )
 
 func main() {
