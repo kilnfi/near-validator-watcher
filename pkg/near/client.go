@@ -1,13 +1,13 @@
-package api
+package near
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"time"
 )
 
 type Client struct {
@@ -31,23 +31,21 @@ type Response struct {
 		Code    int    `json:"code"`
 		Message string `json:"message"`
 		Data    string `json:"data"`
+		Cause   struct {
+			Info interface{} `json:"info"`
+			Name string      `json:"name"`
+		} `json:"cause"`
 	} `json:"error"`
 }
 
-func NewClient(endpoint string) *Client {
-	timeout := time.Duration(10 * time.Second)
-
-	httpClient := &http.Client{
-		Timeout: timeout,
-	}
-
+func NewClient(endpoint string, httpClient *http.Client) *Client {
 	return &Client{
 		Endpoint:   endpoint,
 		httpClient: httpClient,
 	}
 }
 
-func (c *Client) Request(method string, params interface{}) (*Response, error) {
+func (c *Client) Request(ctx context.Context, method string, params interface{}) (*Response, error) {
 	payload, err := json.Marshal(map[string]string{
 		"query": method,
 	})
@@ -69,7 +67,7 @@ func (c *Client) Request(method string, params interface{}) (*Response, error) {
 		}
 	}
 
-	req, err := http.NewRequest("POST", c.Endpoint, bytes.NewBuffer(payload))
+	req, err := http.NewRequestWithContext(ctx, "POST", c.Endpoint, bytes.NewBuffer(payload))
 	req.Header.Set("Content-Type", "application/json")
 	if err != nil {
 		return nil, err
@@ -96,8 +94,8 @@ func (c *Client) Request(method string, params interface{}) (*Response, error) {
 	return resp, nil
 }
 
-func (c *Client) do(method string, params interface{}, result interface{}) error {
-	resp, err := c.Request(method, params)
+func (c *Client) call(ctx context.Context, method string, params interface{}, result interface{}) error {
+	resp, err := c.Request(ctx, method, params)
 	if err != nil {
 		return err
 	}

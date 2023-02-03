@@ -1,8 +1,8 @@
-package api
+package near
 
-const ValidatorsMethod = "validators"
+import "context"
 
-type ValidatorsResult struct {
+type ValidatorsResponse struct {
 	CurrentValidators []struct {
 		Validator
 		IsSlashed         bool  `json:"is_slashed"`
@@ -34,9 +34,8 @@ type Validator struct {
 	Stake     string `json:"stake"`
 }
 
-func (c *Client) Validators() (*ValidatorsResult, error) {
-	var result *ValidatorsResult
-	err := c.do(ValidatorsMethod, "latest", &result)
-
-	return result, err
+func (c *Client) Validators(ctx context.Context, params interface{}) (ValidatorsResponse, error) {
+	var resp ValidatorsResponse
+	err := c.call(ctx, "validators", params, &resp)
+	return resp, err
 }

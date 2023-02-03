@@ -1,9 +1,9 @@
-package api
+package near
 
-const StatusMethod = "status"
+import "context"
 
-type StatusResult struct {
-	ChainId               string `json:"chain_id"`
+type StatusResponse struct {
+	ChainID               string `json:"chain_id"`
 	LatestProtocolVersion int    `json:"latest_protocol_version"`
 	ProtocolVersion       int    `json:"protocol_version"`
 	RpcAddr               string `json:"rpc_addr"`
@@ -24,9 +24,8 @@ type StatusResult struct {
 	} `json:"version"`
 }
 
-func (c *Client) Status() (*StatusResult, error) {
-	var result *StatusResult
-	err := c.do(StatusMethod, nil, &result)
-
-	return result, err
+func (c *Client) Status(ctx context.Context) (StatusResponse, error) {
+	var resp StatusResponse
+	err := c.call(ctx, "status", nil, &resp)
+	return resp, err
 }

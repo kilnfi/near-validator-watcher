@@ -1,12 +1,11 @@
-package api
+package near
 
 import (
+	"context"
 	"time"
 )
 
-const ProtocolConfigMethod = "EXPERIMENTAL_protocol_config"
-
-type ProtocolConfigResult struct {
+type ProtocolConfigResponse struct {
 	ProtocolVersion                 int       `json:"protocol_version"`
 	GenesisTime                     time.Time `json:"genesis_time"`
 	ChainID                         string    `json:"chain_id"`
@@ -213,9 +212,8 @@ type ProtocolConfigResult struct {
 	MinimumStakeDivisor       int    `json:"minimum_stake_divisor"`
 }
 
-func (c *Client) ProtocolConfig() (*ProtocolConfigResult, error) {
-	var result *ProtocolConfigResult
-	err := c.do(ProtocolConfigMethod, map[string]string{"finality": "final"}, &result)
-
-	return result, err
+func (c *Client) ProtocolConfig(ctx context.Context) (ProtocolConfigResponse, error) {
+	var resp ProtocolConfigResponse
+	err := c.call(ctx, "EXPERIMENTAL_protocol_config", map[string]string{"finality": "final"}, &resp)
+	return resp, err
 }
