@@ -125,10 +125,10 @@ func (e *Exporter) collectStatus(ctx context.Context) error {
 		isSyncing = 1
 	}
 
-	e.metrics.ChainID.WithLabelValues(status.ChainID).Set(float64(HashString(status.ChainID)))
-	e.metrics.VersionBuild.WithLabelValues(status.Version.Version, status.Version.Build).Set(float64(HashString(status.Version.Build)))
 	e.metrics.BlockNumber.Set(float64(status.SyncInfo.LatestBlockHeight))
+	e.metrics.ChainID.WithLabelValues(status.ChainID).Set(float64(HashString(status.ChainID)))
 	e.metrics.SyncingDesc.Set(float64(isSyncing))
+	e.metrics.VersionBuild.WithLabelValues(status.Version.Version, status.Version.Build).Set(float64(HashString(status.Version.Build)))
 
 	return nil
 }
@@ -139,11 +139,23 @@ func (e *Exporter) collectValidators(ctx context.Context) error {
 		return err
 	}
 
+	// Reset labeled gauge vec
+	e.metrics.ValidatorExpectedBlocks.Reset()
+	e.metrics.ValidatorExpectedChunks.Reset()
+	e.metrics.ValidatorProducedBlocks.Reset()
+	e.metrics.ValidatorProducedChunks.Reset()
+	e.metrics.ValidatorSlashed.Reset()
+	e.metrics.ValidatorStake.Reset()
+	e.metrics.NextValidatorStake.Reset()
+	e.metrics.CurrentProposals.Reset()
+	e.metrics.PrevEpochKickout.Reset()
+
 	labelEpochStartHeight := strconv.FormatInt(validators.EpochStartHeight, 10)
 
 	e.metrics.EpochStartHeight.Set(float64(validators.EpochStartHeight))
 
 	var seatPrice float64
+
 	for _, v := range validators.CurrentValidators {
 		isSlashed := 0
 		if v.IsSlashed {
