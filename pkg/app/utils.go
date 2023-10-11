@@ -1,34 +1,18 @@
 package app
 
-import (
-	"fmt"
-	"hash/fnv"
-	"strconv"
-)
+import "github.com/sirupsen/logrus"
 
-func GetStakeFromString(s string) float64 {
-	if len(s) == 1 {
-		return 0
+func logLevelFromString(level string) logrus.Level {
+	switch level {
+	case "debug":
+		return logrus.DebugLevel
+	case "info":
+		return logrus.InfoLevel
+	case "warn":
+		return logrus.WarnLevel
+	case "error":
+		return logrus.ErrorLevel
+	default:
+		return logrus.InfoLevel
 	}
-	l := len(s) - 19 - 5
-	v, err := strconv.ParseFloat(s[0:l], 64)
-	if err != nil {
-		fmt.Println(err)
-	}
-	return float64(v)
-}
-
-func GetFloatFromString(s string) float64 {
-	v, err := strconv.ParseFloat(s, 64)
-	if err != nil {
-		fmt.Println(err)
-		return 0
-	}
-	return v
-}
-
-func HashString(s string) uint32 {
-	h := fnv.New32a()
-	h.Write([]byte(s))
-	return h.Sum32()
 }

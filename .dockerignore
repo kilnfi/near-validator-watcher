@@ -1,4 +1,6 @@
-.git/
-.gitignore
-bin/
+/.git
+/.github
+/.gitignore
+/Dockerfile
+/build
 README.md

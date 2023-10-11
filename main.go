@@ -1,13 +1,27 @@
 package main
 
 import (
-	"github.com/kilnfi/near-exporter/cmd"
-	log "github.com/sirupsen/logrus"
+	"context"
+	"errors"
+	"os"
+
+	"github.com/kilnfi/near-validator-watcher/pkg/app"
+	"github.com/rs/zerolog/log"
+	"github.com/urfave/cli/v2"
 )
 
+var Version = "v0.0.0-dev" // generated at build time
+
 func main() {
-	command := cmd.NewRootCommand()
-	if err := command.Execute(); err != nil {
-		log.WithError(err).Fatalf("main: execution failed")
+	app := &cli.App{
+		Name:    "near-validator-watcher",
+		Usage:   "NEAR validators monitoring tool",
+		Flags:   app.Flags,
+		Action:  app.RunFunc,
+		Version: Version,
+	}
+
+	if err := app.Run(os.Args); err != nil && !errors.Is(err, context.Canceled) {
+		log.Error().Err(err).Msg("")
 	}
 }

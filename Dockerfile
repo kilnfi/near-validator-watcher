@@ -1,9 +1,31 @@
-FROM golang:1.18-alpine3.17 as builder
-WORKDIR /go/src/app
-COPY . .
-RUN CGO_ENABLED=0 go install -ldflags '-extldflags "-static"'
+# Builder
+FROM golang:1.20-alpine3.18 as builder
 
-FROM alpine:3.17
-COPY --from=builder /go/bin/near-exporter /near-exporter
-COPY --from=alpine:latest /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-ENTRYPOINT ["/near-exporter"]
+ARG VERSION="0.0.0-build"
+ENV VERSION=$VERSION
+
+WORKDIR /go/src/app
+
+RUN apk add --no-cache \
+  bash build-base git make
+
+# Copy module files and download dependencies
+COPY go.mod ./
+COPY go.sum ./
+RUN go mod download
+
+# Then copy the rest of the source code and build
+COPY . ./
+RUN make build
+
+# Final image
+FROM alpine:3.18
+RUN apk upgrade && apk add --no-cache bash curl
+
+RUN addgroup -g 1001 app
+RUN adduser -D -G app -u 1001 app
+
+COPY --from=builder /go/src/app/build/cosmos-validator-watcher /
+
+WORKDIR /
+ENTRYPOINT ["/near-validator-watcher"]

@@ -1,8 +1,9 @@
-package app
+package metrics
 
-import "github.com/prometheus/client_golang/prometheus"
-
-const namespace = "near_exporter"
+import (
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/collectors"
+)
 
 type Metrics struct {
 	BlockNumber             prometheus.Gauge
@@ -24,7 +25,7 @@ type Metrics struct {
 	VersionBuild            *prometheus.GaugeVec
 }
 
-func NewMetrics() *Metrics {
+func New(namespace string) *Metrics {
 	return &Metrics{
 		BlockNumber: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
@@ -125,57 +126,25 @@ func NewMetrics() *Metrics {
 	}
 }
 
-func (m *Metrics) RegisterMetrics(reg prometheus.Registerer) error {
-	if err := reg.Register(m.BlockNumber); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ChainID); err != nil {
-		return err
-	}
-	if err := reg.Register(m.CurrentProposals); err != nil {
-		return err
-	}
-	if err := reg.Register(m.EpochLength); err != nil {
-		return err
-	}
-	if err := reg.Register(m.EpochStartHeight); err != nil {
-		return err
-	}
-	if err := reg.Register(m.NextValidatorStake); err != nil {
-		return err
-	}
-	if err := reg.Register(m.PrevEpochKickout); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ProtocolVersion); err != nil {
-		return err
-	}
-	if err := reg.Register(m.SeatPriceDesc); err != nil {
-		return err
-	}
-	if err := reg.Register(m.SyncingDesc); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorExpectedBlocks); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorExpectedChunks); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorProducedBlocks); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorProducedChunks); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorSlashed); err != nil {
-		return err
-	}
-	if err := reg.Register(m.ValidatorStake); err != nil {
-		return err
-	}
-	if err := reg.Register(m.VersionBuild); err != nil {
-		return err
-	}
-	return nil
+func (m *Metrics) Register(reg prometheus.Registerer) {
+	reg.MustRegister(collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	reg.MustRegister(collectors.NewGoCollector())
+
+	reg.MustRegister(m.BlockNumber)
+	reg.MustRegister(m.ChainID)
+	reg.MustRegister(m.CurrentProposals)
+	reg.MustRegister(m.EpochLength)
+	reg.MustRegister(m.EpochStartHeight)
+	reg.MustRegister(m.NextValidatorStake)
+	reg.MustRegister(m.PrevEpochKickout)
+	reg.MustRegister(m.ProtocolVersion)
+	reg.MustRegister(m.SeatPriceDesc)
+	reg.MustRegister(m.SyncingDesc)
+	reg.MustRegister(m.ValidatorExpectedBlocks)
+	reg.MustRegister(m.ValidatorExpectedChunks)
+	reg.MustRegister(m.ValidatorProducedBlocks)
+	reg.MustRegister(m.ValidatorProducedChunks)
+	reg.MustRegister(m.ValidatorSlashed)
+	reg.MustRegister(m.ValidatorStake)
+	reg.MustRegister(m.VersionBuild)
 }
