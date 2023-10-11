@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/kilnfi/near-validator-watcher/pkg/app"
-	"github.com/rs/zerolog/log"
+	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 )
 
@@ -22,6 +22,6 @@ func main() {
 	}
 
 	if err := app.Run(os.Args); err != nil && !errors.Is(err, context.Canceled) {
-		log.Error().Err(err).Msg("")
+		logrus.WithError(err).Fatal("application failed")
 	}
 }

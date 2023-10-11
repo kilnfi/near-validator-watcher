@@ -25,7 +25,7 @@ RUN apk upgrade && apk add --no-cache bash curl
 RUN addgroup -g 1001 app
 RUN adduser -D -G app -u 1001 app
 
-COPY --from=builder /go/src/app/build/cosmos-validator-watcher /
+COPY --from=builder /go/src/app/build/near-validator-watcher /
 
 WORKDIR /
 ENTRYPOINT ["/near-validator-watcher"]
