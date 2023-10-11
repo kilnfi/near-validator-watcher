@@ -8,6 +8,8 @@
 
 Example on mainnet using the default RPC endpoint.
 
+![Near Validator Watcher Grafana Dashboard (Prometheus Exporter)](assets/near-validator-watcher-grafana-dashboard.jpg)
+
 ### Via compiled binary
 
 Compiled binary can be found on the [Releases page](https://github.com/kilnfi/near-validator-watcher/releases).
