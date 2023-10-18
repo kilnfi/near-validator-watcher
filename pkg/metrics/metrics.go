@@ -22,6 +22,7 @@ type Metrics struct {
 	ValidatorProducedChunks *prometheus.GaugeVec
 	ValidatorSlashed        *prometheus.GaugeVec
 	ValidatorStake          *prometheus.GaugeVec
+	ValidatorRank           *prometheus.GaugeVec
 	VersionBuild            *prometheus.GaugeVec
 }
 
@@ -117,6 +118,12 @@ func New(namespace string) *Metrics {
 			Help:      "Current amount of validator stake"},
 			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 		),
+		ValidatorRank: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "validator_rank",
+			Help:      "Current rank of validator based on stake"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
+		),
 		VersionBuild: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "version_build",
@@ -146,5 +153,6 @@ func (m *Metrics) Register(reg prometheus.Registerer) {
 	reg.MustRegister(m.ValidatorProducedChunks)
 	reg.MustRegister(m.ValidatorSlashed)
 	reg.MustRegister(m.ValidatorStake)
+	reg.MustRegister(m.ValidatorRank)
 	reg.MustRegister(m.VersionBuild)
 }

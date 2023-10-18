@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -14,7 +13,6 @@ import (
 	"github.com/kilnfi/near-validator-watcher/pkg/near"
 	"github.com/kilnfi/near-validator-watcher/pkg/watcher"
 	"github.com/prometheus/client_golang/prometheus"
-	"github.com/rs/zerolog/log"
 	"github.com/sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 	"golang.org/x/sync/errgroup"
@@ -101,7 +99,7 @@ func RunFunc(cCtx *cli.Context) error {
 	defer cancel()
 
 	if err := httpServer.Shutdown(ctx); err != nil {
-		log.Error().Err(fmt.Errorf("failed to stop http server: %w", err)).Msg("")
+		logrus.WithError(err).Errorf("failed to stop http server")
 	}
 
 	// Wait for all goroutines to finish
