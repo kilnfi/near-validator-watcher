@@ -22,7 +22,7 @@ type Watcher struct {
 	client  *near.Client
 	metrics *metrics.Metrics
 
-	isSyncing atomic.Bool
+	isSynced atomic.Bool
 }
 
 func New(client *near.Client, metrics *metrics.Metrics, config *Config) *Watcher {
@@ -33,8 +33,8 @@ func New(client *near.Client, metrics *metrics.Metrics, config *Config) *Watcher
 	}
 }
 
-func (w *Watcher) IsSyncing() bool {
-	return w.isSyncing.Load()
+func (w *Watcher) IsSynced() bool {
+	return w.isSynced.Load()
 }
 
 func (w *Watcher) Start(ctx context.Context) error {
@@ -100,16 +100,16 @@ func (w *Watcher) collectStatus(ctx context.Context) (near.StatusResponse, error
 	logrus.Debug("collect status")
 
 	status, err := w.client.Status(ctx)
-	w.isSyncing.Store(status.SyncInfo.Syncing)
-
 	if err != nil {
 		return status, fmt.Errorf("failed to get status: %w", err)
 	}
 
+	w.isSynced.Store(!status.SyncInfo.Syncing)
+
 	w.metrics.BlockNumber.Set(float64(status.SyncInfo.LatestBlockHeight))
-	w.metrics.ChainID.WithLabelValues(status.ChainID).Set(float64(HashString(status.ChainID)))
+	w.metrics.ChainID.WithLabelValues(status.ChainID).Set(metrics.StringToFloat64(status.ChainID))
 	w.metrics.SyncingDesc.Set(metrics.BoolToFloat64(status.SyncInfo.Syncing))
-	w.metrics.VersionBuild.WithLabelValues(status.Version.Version, status.Version.Build).Set(float64(HashString(status.Version.Build)))
+	w.metrics.VersionBuild.WithLabelValues(status.Version.Version, status.Version.Build).Set(metrics.StringToFloat64(status.Version.Build))
 
 	return status, nil
 }
@@ -169,7 +169,7 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 		}
 	}
 
-	w.metrics.SeatPriceDesc.Set(seatPrice)
+	w.metrics.SeatPrice.Set(seatPrice)
 
 	for _, v := range validators.NextValidators {
 		w.metrics.NextValidatorStake.
