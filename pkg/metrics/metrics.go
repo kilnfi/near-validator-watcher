@@ -14,7 +14,7 @@ type Metrics struct {
 	NextValidatorStake      *prometheus.GaugeVec
 	PrevEpochKickout        *prometheus.GaugeVec
 	ProtocolVersion         prometheus.Gauge
-	SeatPriceDesc           prometheus.Gauge
+	SeatPrice               prometheus.Gauge
 	SyncingDesc             prometheus.Gauge
 	ValidatorExpectedBlocks *prometheus.GaugeVec
 	ValidatorExpectedChunks *prometheus.GaugeVec
@@ -65,14 +65,14 @@ func New(namespace string) *Metrics {
 			Namespace: namespace,
 			Name:      "prev_epoch_kickout",
 			Help:      "Near previous epoch kicked out validators"},
-			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
+			[]string{"account_id", "reason", "epoch_start_height", "tracked"},
 		),
 		ProtocolVersion: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "protocol_version",
 			Help:      "Current protocol version deployed to the blockchain",
 		}),
-		SeatPriceDesc: prometheus.NewGauge(prometheus.GaugeOpts{
+		SeatPrice: prometheus.NewGauge(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "seat_price",
 			Help:      "Validator seat price",
@@ -145,7 +145,7 @@ func (m *Metrics) Register(reg prometheus.Registerer) {
 	reg.MustRegister(m.NextValidatorStake)
 	reg.MustRegister(m.PrevEpochKickout)
 	reg.MustRegister(m.ProtocolVersion)
-	reg.MustRegister(m.SeatPriceDesc)
+	reg.MustRegister(m.SeatPrice)
 	reg.MustRegister(m.SyncingDesc)
 	reg.MustRegister(m.ValidatorExpectedBlocks)
 	reg.MustRegister(m.ValidatorExpectedChunks)

@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -56,10 +55,13 @@ func RunFunc(cCtx *cli.Context) error {
 	// Validator Watcher
 	//
 	logrus.Infof("connecting to node %s", node)
+
+	client := near.NewClient(node)
+
 	registry := prometheus.NewRegistry()
 	metrics := metrics.New(namespace)
 	metrics.Register(registry)
-	client := near.NewClient(node, &http.Client{})
+
 	watcher := watcher.New(client, metrics, &watcher.Config{
 		Writer:          os.Stdout,
 		TrackedAccounts: validators,
@@ -73,9 +75,7 @@ func RunFunc(cCtx *cli.Context) error {
 	// HTTP server
 	//
 	logrus.Infof("starting HTTP server on %s", httpAddr)
-	readyProbe := func() bool {
-		return !watcher.IsSyncing()
-	}
+	readyProbe := watcher.IsSynced
 	httpServer := NewHTTPServer(
 		httpAddr,
 		WithReadyProbe(readyProbe),

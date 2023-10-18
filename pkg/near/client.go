@@ -38,11 +38,25 @@ type Response struct {
 	} `json:"error"`
 }
 
-func NewClient(endpoint string, httpClient *http.Client) *Client {
-	return &Client{
-		Endpoint:   endpoint,
-		httpClient: httpClient,
+type Option func(*Client)
+
+func WithHTTPClient(httpClient *http.Client) Option {
+	return func(c *Client) {
+		c.httpClient = httpClient
 	}
+}
+
+func NewClient(endpoint string, options ...Option) *Client {
+	client := &Client{
+		Endpoint:   endpoint,
+		httpClient: &http.Client{},
+	}
+
+	for _, option := range options {
+		option(client)
+	}
+
+	return client
 }
 
 func (c *Client) Request(ctx context.Context, method string, params interface{}) (*Response, error) {
