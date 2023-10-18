@@ -6,7 +6,7 @@ require (
 	github.com/avast/retry-go/v4 v4.5.0
 	github.com/fatih/color v1.15.0
 	github.com/prometheus/client_golang v1.16.0
-	github.com/rs/zerolog v1.31.0
+	github.com/shopspring/decimal v1.3.1
 	github.com/sirupsen/logrus v1.9.0
 	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/sync v0.3.0

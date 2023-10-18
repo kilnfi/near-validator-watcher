@@ -1,6 +1,10 @@
 package near
 
-import "context"
+import (
+	"context"
+
+	"github.com/shopspring/decimal"
+)
 
 type ValidatorsResponse struct {
 	CurrentValidators []struct {
@@ -29,9 +33,9 @@ type ValidatorsResponse struct {
 }
 
 type Validator struct {
-	AccountId string `json:"account_id"`
-	PublicKey string `json:"public_key"`
-	Stake     string `json:"stake"`
+	AccountId string          `json:"account_id"`
+	PublicKey string          `json:"public_key"`
+	Stake     decimal.Decimal `json:"stake"`
 }
 
 func (c *Client) Validators(ctx context.Context, params interface{}) (ValidatorsResponse, error) {

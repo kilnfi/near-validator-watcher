@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -138,23 +139,28 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 
 	var seatPrice float64
 
-	for _, v := range validators.CurrentValidators {
-		isSlashed := 0
-		if v.IsSlashed {
-			isSlashed = 1
-		}
+	// Sort validators by stake to be able to calculate their rank
+	rankedValidator := validators.CurrentValidators
+	sort.SliceStable(rankedValidator, func(i, j int) bool {
+		return rankedValidator[i].Stake.GreaterThan(rankedValidator[j].Stake)
+	})
 
+	for i, v := range rankedValidator {
 		labels := []string{v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)}
+
+		w.metrics.ValidatorRank.
+			WithLabelValues(v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)).
+			Set(float64(i + 1))
 
 		w.metrics.ValidatorExpectedBlocks.WithLabelValues(labels...).Set(float64(v.NumExpectedBlocks))
 		w.metrics.ValidatorExpectedChunks.WithLabelValues(labels...).Set(float64(v.NumExpectedChunks))
 		w.metrics.ValidatorProducedBlocks.WithLabelValues(labels...).Set(float64(v.NumProducedBlocks))
 		w.metrics.ValidatorProducedChunks.WithLabelValues(labels...).Set(float64(v.NumProducedChunks))
 
-		w.metrics.ValidatorSlashed.WithLabelValues(labels...).Set(float64(isSlashed))
-		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(float64(GetStakeFromString(v.Stake)))
+		w.metrics.ValidatorSlashed.WithLabelValues(labels...).Set(metrics.BoolToFloat64(v.IsSlashed))
+		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(v.Stake.InexactFloat64())
 
-		t := GetStakeFromString(v.Stake)
+		t := v.Stake.InexactFloat64()
 		if seatPrice == 0 {
 			seatPrice = t
 		}
@@ -168,13 +174,13 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 	for _, v := range validators.NextValidators {
 		w.metrics.NextValidatorStake.
 			WithLabelValues(v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)).
-			Set(float64(GetStakeFromString(v.Stake)))
+			Set(v.Stake.InexactFloat64())
 	}
 
 	for _, v := range validators.CurrentProposals {
 		w.metrics.CurrentProposals.
 			WithLabelValues(v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)).
-			Set(float64(GetStakeFromString(v.Stake)))
+			Set(v.Stake.InexactFloat64())
 	}
 
 	for _, v := range validators.PrevEpochKickOut {
