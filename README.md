@@ -4,11 +4,11 @@
 
 **Near Validator Watcher** is a Prometheus exporter to help you monitor missed blocks & chunks of your validator.
 
+![Near Validator Watcher Grafana Dashboard (Prometheus Exporter)](assets/near-validator-watcher-grafana-dashboard.jpg)
+
 ## ✨ Usage
 
 Example on mainnet using the default RPC endpoint.
-
-![Near Validator Watcher Grafana Dashboard (Prometheus Exporter)](assets/near-validator-watcher-grafana-dashboard.jpg)
 
 ### Via compiled binary
 
@@ -60,7 +60,7 @@ GLOBAL OPTIONS:
 ## ❇️ Endpoints
 
 - `/metrics` exposed Prometheus metrics (see next section)
-- `/ready` responds OK when at the node is synced
+- `/ready` responds OK when the node is synced
 - `/live` responds OK as soon as server is up & running correctly
 
 
@@ -84,6 +84,7 @@ Metrics (without prefix)    | Description
 `validator_blocks_produced` | Current amount of validator produced blocks
 `validator_chunks_expected` | Current amount of validator expected chunks
 `validator_chunks_produced` | Current amount of validator produced chunks
+`validator_rank`            | Current rank of validator based on stake
 `validator_slashed`         | Validators slashed
 `validator_stake`           | Current amount of validator stake
 `version_build`             | The Near node version build
