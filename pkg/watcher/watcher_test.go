@@ -400,13 +400,13 @@ func TestWatcher(t *testing.T) {
 
 		// Stake
 		assert.Equal(t, 5, testutil.CollectAndCount(metrics.ValidatorStake))
-		assert.Equal(t, float64(47595986932991225292162473028453), testutil.ToFloat64(metrics.ValidatorStake.WithLabelValues(
+		assert.Equal(t, float64(47595986.932991225292162473028453), testutil.ToFloat64(metrics.ValidatorStake.WithLabelValues(
 			"node2",
 			`ed25519:GkDv7nSMS3xcqA45cpMvFmfV1o4fRF6zYo1JRR6mNqg5`,
 			"142256359",
 			"0",
 		)))
-		assert.Equal(t, float64(6736422258840329637507414885764), testutil.ToFloat64(metrics.ValidatorStake.WithLabelValues(
+		assert.Equal(t, float64(6736422.258840329637507414885764), testutil.ToFloat64(metrics.ValidatorStake.WithLabelValues(
 			"kiln.pool.f863973.m0",
 			`ed25519:Bq8fe1eUgDRexX2CYDMhMMQBiN13j8vTAVFyTNhEfh1W`,
 			"142256359",

@@ -14,8 +14,11 @@ import (
 	"github.com/fatih/color"
 	"github.com/kilnfi/near-validator-watcher/pkg/metrics"
 	"github.com/kilnfi/near-validator-watcher/pkg/near"
+	"github.com/shopspring/decimal"
 	"github.com/sirupsen/logrus"
 )
+
+var yoctoUnit = decimal.NewFromInt(10).Pow(decimal.NewFromInt(24))
 
 type Watcher struct {
 	config  *Config
@@ -158,7 +161,7 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 		w.metrics.ValidatorProducedChunks.WithLabelValues(labels...).Set(float64(v.NumProducedChunks))
 
 		w.metrics.ValidatorSlashed.WithLabelValues(labels...).Set(metrics.BoolToFloat64(v.IsSlashed))
-		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(v.Stake.InexactFloat64())
+		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(v.Stake.Div(yoctoUnit).InexactFloat64())
 
 		t := v.Stake.InexactFloat64()
 		if seatPrice == 0 {
@@ -174,13 +177,13 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 	for _, v := range validators.NextValidators {
 		w.metrics.NextValidatorStake.
 			WithLabelValues(v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)).
-			Set(v.Stake.InexactFloat64())
+			Set(v.Stake.Div(yoctoUnit).InexactFloat64())
 	}
 
 	for _, v := range validators.CurrentProposals {
 		w.metrics.CurrentProposals.
 			WithLabelValues(v.AccountId, v.PublicKey, labelEpochStartHeight, w.isTracked(v.AccountId)).
-			Set(v.Stake.InexactFloat64())
+			Set(v.Stake.Div(yoctoUnit).InexactFloat64())
 	}
 
 	for _, v := range validators.PrevEpochKickOut {
