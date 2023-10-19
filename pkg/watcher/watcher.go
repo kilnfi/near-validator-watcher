@@ -163,7 +163,7 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 		w.metrics.ValidatorSlashed.WithLabelValues(labels...).Set(metrics.BoolToFloat64(v.IsSlashed))
 		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(v.Stake.Div(yoctoUnit).InexactFloat64())
 
-		t := v.Stake.InexactFloat64()
+		t := v.Stake.Div(yoctoUnit).InexactFloat64()
 		if seatPrice == 0 {
 			seatPrice = t
 		}

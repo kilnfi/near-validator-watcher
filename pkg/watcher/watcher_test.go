@@ -306,7 +306,7 @@ func TestWatcher(t *testing.T) {
 		require.NoError(t, err)
 
 		assert.Equal(t, float64(142256359), testutil.ToFloat64(metrics.EpochStartHeight))
-		assert.Equal(t, float64(5048850744401447176504014136424), testutil.ToFloat64(metrics.SeatPrice))
+		assert.Equal(t, float64(5048850.744401447176504014136424), testutil.ToFloat64(metrics.SeatPrice))
 
 		// ValidatorRank
 		assert.Equal(t, 5, testutil.CollectAndCount(metrics.ValidatorRank))
