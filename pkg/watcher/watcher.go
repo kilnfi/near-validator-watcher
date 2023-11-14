@@ -132,6 +132,7 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 	w.metrics.ValidatorProducedChunks.Reset()
 	w.metrics.ValidatorSlashed.Reset()
 	w.metrics.ValidatorStake.Reset()
+	w.metrics.ValidatorRank.Reset()
 	w.metrics.NextValidatorStake.Reset()
 	w.metrics.CurrentProposals.Reset()
 	w.metrics.PrevEpochKickout.Reset()
