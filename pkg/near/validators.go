@@ -9,12 +9,14 @@ import (
 type ValidatorsResponse struct {
 	CurrentValidators []struct {
 		Validator
-		IsSlashed         bool  `json:"is_slashed"`
-		Shards            []int `json:"shards"`
-		NumProducedBlocks int64 `json:"num_produced_blocks"`
-		NumExpectedBlocks int64 `json:"num_expected_blocks"`
-		NumProducedChunks int64 `json:"num_produced_chunks"`
-		NumExpectedChunks int64 `json:"num_expected_chunks"`
+		IsSlashed               bool  `json:"is_slashed"`
+		Shards                  []int `json:"shards"`
+		NumProducedBlocks       int64 `json:"num_produced_blocks"`
+		NumExpectedBlocks       int64 `json:"num_expected_blocks"`
+		NumProducedChunks       int64 `json:"num_produced_chunks"`
+		NumExpectedChunks       int64 `json:"num_expected_chunks"`
+		NumProducedEndorsements int64 `json:"num_produced_endorsements"`
+		NumExpectedEndorsements int64 `json:"num_expected_endorsements"`
 	} `json:"current_validators"`
 	NextValidators []struct {
 		Validator

@@ -6,24 +6,26 @@ import (
 )
 
 type Metrics struct {
-	BlockNumber             prometheus.Gauge
-	ChainID                 *prometheus.GaugeVec
-	CurrentProposals        *prometheus.GaugeVec
-	EpochLength             prometheus.Gauge
-	EpochStartHeight        prometheus.Gauge
-	NextValidatorStake      *prometheus.GaugeVec
-	PrevEpochKickout        *prometheus.GaugeVec
-	ProtocolVersion         prometheus.Gauge
-	SeatPrice               prometheus.Gauge
-	SyncingDesc             prometheus.Gauge
-	ValidatorExpectedBlocks *prometheus.GaugeVec
-	ValidatorExpectedChunks *prometheus.GaugeVec
-	ValidatorProducedBlocks *prometheus.GaugeVec
-	ValidatorProducedChunks *prometheus.GaugeVec
-	ValidatorSlashed        *prometheus.GaugeVec
-	ValidatorStake          *prometheus.GaugeVec
-	ValidatorRank           *prometheus.GaugeVec
-	VersionBuild            *prometheus.GaugeVec
+	BlockNumber                   prometheus.Gauge
+	ChainID                       *prometheus.GaugeVec
+	CurrentProposals              *prometheus.GaugeVec
+	EpochLength                   prometheus.Gauge
+	EpochStartHeight              prometheus.Gauge
+	NextValidatorStake            *prometheus.GaugeVec
+	PrevEpochKickout              *prometheus.GaugeVec
+	ProtocolVersion               prometheus.Gauge
+	SeatPrice                     prometheus.Gauge
+	SyncingDesc                   prometheus.Gauge
+	ValidatorExpectedBlocks       *prometheus.GaugeVec
+	ValidatorExpectedChunks       *prometheus.GaugeVec
+	ValidatorExpectedEndorsements *prometheus.GaugeVec
+	ValidatorProducedBlocks       *prometheus.GaugeVec
+	ValidatorProducedChunks       *prometheus.GaugeVec
+	ValidatorProducedEndorsements *prometheus.GaugeVec
+	ValidatorSlashed              *prometheus.GaugeVec
+	ValidatorStake                *prometheus.GaugeVec
+	ValidatorRank                 *prometheus.GaugeVec
+	VersionBuild                  *prometheus.GaugeVec
 }
 
 func New(namespace string) *Metrics {
@@ -94,6 +96,12 @@ func New(namespace string) *Metrics {
 			Help:      "Current amount of validator expected chunks"},
 			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 		),
+		ValidatorExpectedEndorsements: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "validator_endorsements_expected",
+			Help:      "Current amount of validator expected endorsements"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
+		),
 		ValidatorProducedBlocks: prometheus.NewGaugeVec(prometheus.GaugeOpts{
 			Namespace: namespace,
 			Name:      "validator_blocks_produced",
@@ -104,6 +112,12 @@ func New(namespace string) *Metrics {
 			Namespace: namespace,
 			Name:      "validator_chunks_produced",
 			Help:      "Current amount of validator produced chunks"},
+			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
+		),
+		ValidatorProducedEndorsements: prometheus.NewGaugeVec(prometheus.GaugeOpts{
+			Namespace: namespace,
+			Name:      "validator_endorsements_produced",
+			Help:      "Current amount of validator produced endorsements"},
 			[]string{"account_id", "public_key", "epoch_start_height", "tracked"},
 		),
 		ValidatorSlashed: prometheus.NewGaugeVec(prometheus.GaugeOpts{
@@ -149,8 +163,10 @@ func (m *Metrics) Register(reg prometheus.Registerer) {
 	reg.MustRegister(m.SyncingDesc)
 	reg.MustRegister(m.ValidatorExpectedBlocks)
 	reg.MustRegister(m.ValidatorExpectedChunks)
+	reg.MustRegister(m.ValidatorExpectedEndorsements)
 	reg.MustRegister(m.ValidatorProducedBlocks)
 	reg.MustRegister(m.ValidatorProducedChunks)
+	reg.MustRegister(m.ValidatorProducedEndorsements)
 	reg.MustRegister(m.ValidatorSlashed)
 	reg.MustRegister(m.ValidatorStake)
 	reg.MustRegister(m.ValidatorRank)
