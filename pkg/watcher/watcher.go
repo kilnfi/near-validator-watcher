@@ -128,8 +128,10 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 	// Reset labeled gauge vec
 	w.metrics.ValidatorExpectedBlocks.Reset()
 	w.metrics.ValidatorExpectedChunks.Reset()
+	w.metrics.ValidatorExpectedEndorsements.Reset()
 	w.metrics.ValidatorProducedBlocks.Reset()
 	w.metrics.ValidatorProducedChunks.Reset()
+	w.metrics.ValidatorProducedEndorsements.Reset()
 	w.metrics.ValidatorSlashed.Reset()
 	w.metrics.ValidatorStake.Reset()
 	w.metrics.ValidatorRank.Reset()
@@ -158,8 +160,10 @@ func (w *Watcher) collectValidators(ctx context.Context) (near.ValidatorsRespons
 
 		w.metrics.ValidatorExpectedBlocks.WithLabelValues(labels...).Set(float64(v.NumExpectedBlocks))
 		w.metrics.ValidatorExpectedChunks.WithLabelValues(labels...).Set(float64(v.NumExpectedChunks))
+		w.metrics.ValidatorExpectedEndorsements.WithLabelValues(labels...).Set(float64(v.NumExpectedEndorsements))
 		w.metrics.ValidatorProducedBlocks.WithLabelValues(labels...).Set(float64(v.NumProducedBlocks))
 		w.metrics.ValidatorProducedChunks.WithLabelValues(labels...).Set(float64(v.NumProducedChunks))
+		w.metrics.ValidatorProducedEndorsements.WithLabelValues(labels...).Set(float64(v.NumProducedEndorsements))
 
 		w.metrics.ValidatorSlashed.WithLabelValues(labels...).Set(metrics.BoolToFloat64(v.IsSlashed))
 		w.metrics.ValidatorStake.WithLabelValues(labels...).Set(v.Stake.Div(yoctoUnit).InexactFloat64())
